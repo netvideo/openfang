@@ -1,0 +1,62 @@
+# syntax=docker/dockerfile:1
+# 中国镜像版本 Dockerfile - 使用国内镜像加速
+
+FROM registry.cn-hangzhou.aliyuncs.com/library/rust:1-slim-bookworm AS builder
+
+# 使用国内 APT 镜像
+RUN rm -f /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian/ bookworm-updates main non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian/ bookworm-backports main non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian-security/ bookworm-security main non-free non-free-firmware" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y pkg-config libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# 配置 Rust 使用国内镜像
+RUN mkdir -p ~/.cargo && \
+    echo '[registry]' > ~/.cargo/config.toml && \
+    echo 'default = "rsproxy-sparse"' >> ~/.cargo/config.toml && \
+    echo '' >> ~/.cargo/config.toml && \
+    echo '[registries]' >> ~/.cargo/config.toml && \
+    echo 'rsproxy-sparse = { index = "sparse+https://rsproxy.cn/crates.io-index/" }' >> ~/.cargo/config.toml && \
+    echo '' >> ~/.cargo/config.toml && \
+    echo '[net]' >> ~/.cargo/config.toml && \
+    echo 'git-fetch-with-cli = true' >> ~/.cargo/config.toml && \
+    echo '' >> ~/.cargo/config.toml && \
+    echo '[http]' >> ~/.cargo/config.toml && \
+    echo 'timeout = 300' >> ~/.cargo/config.toml && \
+    echo 'multiplexing = false' >> ~/.cargo/config.toml
+
+WORKDIR /build
+COPY Cargo.toml Cargo.lock ./
+COPY crates ./crates
+COPY xtask ./xtask
+COPY agents ./agents
+COPY packages ./packages
+
+# 使用国内镜像构建
+RUN cargo build --release --bin openfang
+
+# 运行时阶段 - 使用国内镜像
+FROM registry.cn-hangzhou.aliyuncs.com/library/debian:bookworm-slim
+
+# 使用国内 APT 镜像
+RUN rm -f /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian/ bookworm-updates main non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian/ bookworm-backports main non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.aliyun.com/debian-security/ bookworm-security main non-free non-free-firmware" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /build/target/release/openfang /usr/local/bin/
+COPY --from=builder /build/agents /opt/openfang/agents
+
+EXPOSE 4200
+VOLUME /data
+ENV OPENFANG_HOME=/data
+
+ENTRYPOINT ["openfang"]
+CMD ["start"]
