@@ -200,6 +200,44 @@ Licensed under either of:
 
 ---
 
+## 📚 中文文档索引
+
+以下是完整的中文文档列表，按类别组织：
+
+### 入门指南
+- [快速入门指南](docs/getting-started_CN.md) — 安装、配置、首个智能体
+- [配置参考手册](docs/configuration_CN.md) — 完整的 config.toml 配置选项
+- [CLI 命令参考](docs/cli-reference_CN.md) — 所有命令和选项
+- [故障排除指南](docs/troubleshooting_CN.md) — 常见问题解答
+
+### 核心概念
+- [系统架构](docs/architecture_CN.md) — 14个 crate 的详细架构
+- [智能体模板](docs/agent-templates_CN.md) — 30个预置模板
+- [工作流引擎](docs/workflows_CN.md) — 多智能体编排
+- [安全防护](docs/security_CN.md) — 16层纵深防御
+
+### 集成与扩展
+- [通信通道适配器](docs/channel-adapters_CN.md) — 40个消息通道
+- [LLM 提供商](docs/providers_CN.md) — 20个提供商、51个模型
+- [技能开发](docs/skill-development_CN.md) — 60个内置技能
+- [MCP & A2A 集成](docs/mcp-a2a_CN.md) — 协议集成
+
+### API 与界面
+- [API 参考手册](docs/api-reference_CN.md) — 76个 REST/WS/SSE 端点
+- [桌面应用](docs/desktop_CN.md) — Tauri 2.0 原生应用
+
+### 发布与运维
+- [生产环境检查清单](docs/production-checklist_CN.md) — v0.1.0 发布检查
+- [发布路线图](docs/launch-roadmap_CN.md) — 开发路线图
+
+### 项目文档
+- [贡献指南](../CONTRIBUTING_CN.md) — 开发环境、代码风格
+- [迁移指南](../MIGRATION_CN.md) — 从其他框架迁移
+- [安全政策](../SECURITY_CN.md) — 漏洞报告
+- [变更日志](../CHANGELOG_CN.md) — 版本历史
+
+---
+
 ## 社区与支持
 
 - GitHub: https://github.com/RightNow-AI/openfang
